@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather</title>
+  <link rel="stylesheet" href="ss.css">
+</head>
+<body>
+  <div class="container">
+    <div class="weather">
+      <input type="text" id="textinput" placeholder="Enter your city:" class="textinput"/>
+      <img class="search" onclick="getWeather()" src="/search.png" alt="Search"/>
+    </div>
+    <div class="searchResult" id="searchResult"></div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById("textinput").value.trim();
+      const apikey = "8ed99657e09558f14fc30a9a2c8a4672";
+      const resultDiv = document.getElementById("searchResult");
+
+      if (!city) {
+        resultDiv.innerHTML = '<p>Please enter a city name</p>';
+        return;
+      }
+
+      const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric`;
+
+      try {
+        const response = await fetch(weatherURL);
+        const data = await response.json();
+
+        if (data.cod !== 200) {
+          resultDiv.innerHTML = `<p>${data.message}</p>`;
+          return;
+        }
+
+        const iconCode = data.weather[0].icon;
+        const iconURL = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+        resultDiv.innerHTML = `
+          <div class="box1">
+            <img src="${iconURL}" alt="${data.weather[0].description}"/>
+            <span>${data.name}</span>
+          </div>
+          <div class="box">
+            <img src="/temp1.png" alt="Temperature Icon"/>
+            <span>Temperature: ${data.main.temp} °C</span>
+          </div>
+          <div class="box">
+            <img src="/wind1.png" alt="Wind Icon"/>
+            <span>Wind Speed: ${data.wind.speed} m/s</span>
+          </div>
+          <div class="box">
+            <img src="/weather1.png" alt="Cloud Icon"/>
+            <span>Weather: ${data.weather[0].description}</span>
+          </div>`;
+      } catch (error) {
+        resultDiv.innerHTML = '<p>Error fetching data.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
